@@ -2,6 +2,91 @@
 
 class zeroMatrix {
     static zeroMatrixFunction(matrix) {
+
+        let numberOfRows = matrix.length
+        if (numberOfRows < 1 && matrix[0] === undefined) {
+            //matrix is empty
+            return matrix;
+        }
+
+        let numberOfColumns = matrix[0].length;
+        if (numberOfColumns === undefined) {
+            /*                       -----****** special case ******-----
+             * the matrix[0] is returning a value not an array (resulting in an undefined result)
+             * so there is only one row, this means that the numberOfRows is actually the numberOfColumns
+             * so we will call the oneRowMatrix function passing in the numberOfRows as the numberOfColumns
+             */
+            return this.oneRowMatrix(matrix, numberOfRows);
+        }
+        if (numberOfColumns === 1) {
+            return this.oneColumnMatrix(matrix, numberOfRows);
+        }
+
+        //set up two arrays to store the rows and columns that need to be set to zero
+        let rows = [];
+        for (let i = 0; i < numberOfRows; i++) {
+            rows[i] = -1;
+        }
+
+        let cols = [];
+        for (let i = 0; i < numberOfColumns; i++) {
+            cols[i] = -1;
+        }
+
+        for (let row = 0; row < numberOfRows; row++) {
+            for (let column = 0; column < numberOfColumns; column++) {
+                if (matrix[row][column] === 0) {
+                    rows[row] = 0;
+                    cols[column] = 0;
+                }
+            }
+        }
+
+        for (let row = 0; row < numberOfRows; row++) {
+            for (let column = 0; column < numberOfColumns; column++) {
+                if (rows[row] === 0 || cols[column] === 0) {
+                    matrix[row][column] = 0;
+                }
+            }
+        }
+
+        return matrix;
+    }
+
+    //I'd like this to be private static, but that isn't a thing in JavaScript
+    static oneRowMatrix(matrix, numberOfColumns) {
+        let zeroFound = false;
+        for (let column = 0; column < numberOfColumns; column++) {
+            if (matrix[column] === 0) {
+                zeroFound = true;
+            }
+        }
+
+        if (zeroFound) {
+            for (let column = 0; column < numberOfColumns; column++) {
+                matrix[column] = 0;
+            }
+        }
+
+        return matrix;
+    }
+
+    //I'd like this to be private static, but that isn't a thing in JavaScript
+    static oneColumnMatrix(matrix, numberOfRows) {
+        let zeroFound = false;
+
+        for (let row = 0; row < numberOfRows; row++) {
+            if (matrix[row][0] === 0) {
+                zeroFound = true;
+            }
+        }
+
+        if (zeroFound) {
+            for (let row = 0; row < numberOfRows; row++) {
+                matrix[row][0] = 0;
+            }
+        }
+
         return matrix;
     }
 }
@@ -31,7 +116,7 @@ result = [1, 2, 3];
 addTest(name, matrix, result);
 
 name = 'one row with zero';
-matrix = [1, 2, 0];
+matrix = [0, 2, 3];
 result = [0, 0, 0];
 addTest(name, matrix, result);
 
@@ -45,9 +130,9 @@ result = [[1],
 addTest(name, matrix, result);
 
 name = 'one column with zero';
-matrix = [[0],
+matrix = [[1],
           [2],
-          [3]];
+          [0]];
 result = [[0],
           [0],
           [0]];
@@ -60,7 +145,7 @@ matrix =
      [6, 7, 8]];
 result =
     [[9, 1, 2],
-     [3, 4, 7],
+     [3, 4, 5],
      [6, 7, 8]];
 addTest(name, matrix, result);
 
@@ -71,7 +156,7 @@ matrix =
      [6, 7, 8]];
 result =
     [[0, 0, 0],
-     [0, 4, 7],
+     [0, 4, 5],
      [0, 7, 8]];
 addTest(name, matrix, result);
 
@@ -99,6 +184,7 @@ result =
      [0, 0, 0]];
 addTest(name, matrix, result);
 
+//I went with all single digits to make the tests easier to debug when viewed in the console.
 name = '6 x 6 same row and same column zeros';
 matrix =
     [[1, 2, 3, 4, 5, 6],
@@ -124,8 +210,6 @@ for (let i = 0; i < matrix_tests.length; i++) {
         console.log(`Test ${i}: ${matrix_tests[i].test_name} was successful!`);
     } else {
         console.log(`-------------- Test ${i}: ${matrix_tests[i].test_name} FAILED --------------`);
-        console.log('given');
-        console.log(matrix_tests[i].test_matrix);
         console.log('expected result');
         console.log(matrix_tests[i].expected_result);
         console.log('actual result');
